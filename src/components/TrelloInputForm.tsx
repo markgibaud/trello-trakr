@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './TrelloInputForm.css';
 import { TrelloClient } from '../services/trello';
-import type { TrelloLabel, TrelloCard } from '../services/trello';
-import { saveSelectedLabel, getSelectedLabel } from '../services/browser';
+import type { TrelloLabel, TrelloCard } from '../types/trello';
+import { saveSelectedLabel, getSelectedLabel, initializeSampleCards } from '../services/browser';
 
 interface TrelloInputFormProps {
   onSubmit: (apiKey: string, apiToken: string, boardId: string) => void;
@@ -22,8 +22,22 @@ export function TrelloInputForm({ onSubmit }: TrelloInputFormProps) {
     "credentials" | "labels"
   >("credentials");
 
-  // Check for saved credentials on component mount
+
+  // Check for saved credentials and initialize sample cards on component mount
   useEffect(() => {
+    const initialize = async () => {
+      try {
+        await initializeSampleCards();
+      } catch (error) {
+        console.error('Error initializing sample cards:', error);
+      }
+    };
+
+    initialize();
+  }, []);
+
+  useEffect(() => {
+    // Check for saved credentials
     const savedCredentials = TrelloClient.getCredentials();
     if (savedCredentials) {
       setApiKey(savedCredentials.apiKey);
@@ -31,6 +45,7 @@ export function TrelloInputForm({ onSubmit }: TrelloInputFormProps) {
       setBoardId(savedCredentials.boardId);
     }
 
+    // Check for saved label
     const savedLabelId = getSelectedLabel();
     if (savedLabelId) {
       setSelectedLabelId(savedLabelId);
@@ -211,10 +226,7 @@ export function TrelloInputForm({ onSubmit }: TrelloInputFormProps) {
   return (
     <div className="form-container">
       {error && <div className="error-message">{error}</div>}
-
-      {connectionStep === "credentials"
-        ? renderCredentialsForm()
-        : renderLabelSelection()}
+      {connectionStep === "credentials" ? renderCredentialsForm() : renderLabelSelection()}
     </div>
   );
 }

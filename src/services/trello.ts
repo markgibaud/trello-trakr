@@ -2,31 +2,9 @@
  * Trello service for interacting with the Trello API
  */
 import { saveCards } from './browser';
+import type { TrelloCredentials, TrelloLabel, TrelloCard } from '../types/trello';
 
-export interface TrelloCredentials {
-  apiKey: string;
-  apiToken: string;
-  boardId: string;
-}
-
-export interface TrelloLabel {
-  id: string;
-  name: string;
-  color: string;
-}
-
-export interface TrelloCard {
-  id: string;
-  name: string;
-  desc: string;
-  idBoard: string;
-  idList: string;
-  url: string;
-  shortUrl: string;
-  dateLastActivity: string;
-  labels: TrelloLabel[];
-  [key: string]: any; // For other properties that might be returned
-}
+// Using types from '../types/trello'
 
 export class TrelloClient {
   private apiKey: string;
